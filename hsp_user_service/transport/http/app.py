@@ -10,7 +10,7 @@ def create_http_app(echo_service: EchoService) -> FastAPI:
     app = FastAPI(title="HSP User Service")
     app.include_router(build_router(echo_service))
 
-    @app.get("/healthz", tags=["health"])
+    @app.get("/api/users/health", tags=["health"])
     async def healthz() -> dict[str, str]:
         return {"status": "ok"}
 

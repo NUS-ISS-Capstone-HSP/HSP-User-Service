@@ -14,7 +14,7 @@ Python 后端模板，提供同一业务能力的 HTTP + gRPC 双入口，采用
 ## 功能接口
 
 HTTP:
-- `GET /healthz`
+- `GET /api/users/health`
 - `POST /api/v1/echo`
 - `GET /api/v1/echo/{id}`
 
@@ -64,7 +64,7 @@ make run
 5. 验证服务
 
 ```bash
-curl http://127.0.0.1:8080/healthz
+curl http://127.0.0.1:8080/api/users/health
 ```
 
 返回 `{"status":"ok"}` 表示 HTTP 服务启动成功。
