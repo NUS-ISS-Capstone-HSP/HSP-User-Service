@@ -37,10 +37,10 @@ python --version
 cp .env.example .env
 ```
 
-如果服务在本机运行（`make run`），MySQL 也在本机 Docker 映射端口（如 `127.0.0.1:3306`），请将 `.env` 中的 `MYSQL_DSN` 改为：
+如果服务在本机运行（`make run`），MySQL 也在本机 Docker 映射端口（如 `127.0.0.1:3306`），请将 `.env` 中的 `HSP_USER_SERVICE_MYSQL_DSN` 改为：
 
 ```env
-MYSQL_DSN=mysql+aiomysql://<username>:<pwd>@127.0.0.1:3306/execution_db
+HSP_USER_SERVICE_MYSQL_DSN=mysql+aiomysql://<username>:<pwd>@127.0.0.1:3306/execution_db
 ```
 
 2. 安装依赖
@@ -92,7 +92,7 @@ make docker-build
 ## 环境变量
 
 参考 `.env.example`，关键项：
-- `HTTP_HOST` / `HTTP_PORT`
-- `GRPC_HOST` / `GRPC_PORT`
-- `MYSQL_DSN`
-- `USE_MOCK_REPOSITORY`
+- `HSP_USER_SERVICE_HTTP_HOST` / `HSP_USER_SERVICE_HTTP_PORT`
+- `HSP_USER_SERVICE_GRPC_HOST` / `HSP_USER_SERVICE_GRPC_PORT`
+- `HSP_USER_SERVICE_MYSQL_DSN`
+- `HSP_USER_SERVICE_USE_MOCK_REPOSITORY`
