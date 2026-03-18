@@ -6,3 +6,4 @@ sqlalchemy[asyncio]>=2.0,<3.0
 aiomysql>=0.2,<1.0
 grpcio>=1.78,<2.0
 protobuf>=6.31,<7.0
+PyMySQL[rsa]==1.1.1
