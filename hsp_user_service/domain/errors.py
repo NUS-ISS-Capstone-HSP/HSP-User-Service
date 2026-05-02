@@ -8,3 +8,15 @@ class ValidationError(DomainError):
 
 class NotFoundError(DomainError):
     """Raised when entity does not exist."""
+
+
+class ConflictError(DomainError):
+    """Raised when entity conflicts with existing data."""
+
+
+class AuthenticationError(DomainError):
+    """Raised when authentication fails."""
+
+
+class AuthorizationError(DomainError):
+    """Raised when authorization fails."""

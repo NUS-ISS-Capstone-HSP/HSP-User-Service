@@ -5,8 +5,8 @@ import pytest
 from hsp_user_service.bootstrap.container import build_container
 from hsp_user_service.config import get_settings
 from hsp_user_service.domain.models import SourceType
-from hsp_user_service.repository.in_memory import InMemoryEchoRepository
-from hsp_user_service.repository.mysql import SQLAlchemyEchoRepository
+from hsp_user_service.repository.in_memory import InMemoryEchoRepository, InMemoryUserRepository
+from hsp_user_service.repository.mysql import SQLAlchemyEchoRepository, SQLAlchemyUserRepository
 
 
 @pytest.mark.asyncio
@@ -19,6 +19,7 @@ async def test_build_container_with_mock_repository(monkeypatch: pytest.MonkeyPa
     container = await build_container()
 
     assert isinstance(container.echo_repository, InMemoryEchoRepository)
+    assert isinstance(container.user_repository, InMemoryUserRepository)
     assert container.engine is None
     assert container.session_factory is None
 
@@ -39,6 +40,7 @@ async def test_build_container_with_sqlalchemy_repository(
     container = await build_container()
 
     assert isinstance(container.echo_repository, SQLAlchemyEchoRepository)
+    assert isinstance(container.user_repository, SQLAlchemyUserRepository)
     assert container.engine is not None
     assert container.session_factory is not None
 

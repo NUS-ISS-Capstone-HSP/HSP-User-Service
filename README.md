@@ -15,13 +15,27 @@ Python 后端模板，提供同一业务能力的 HTTP + gRPC 双入口，采用
 
 HTTP:
 - `GET /api/users/health`
-- `POST /api/v1/echo`
-- `GET /api/v1/echo/{id}`
+- `POST /api/users/v1/echo`
+- `GET /api/users/v1/echo/{id}`
+- `POST /api/users/v1/auth/register`
+- `POST /api/users/v1/auth/login`
+- `POST /api/users/v1/auth/logout`
+- `GET /api/users/v1/auth/me`
+- `GET /api/users/v1/admin/dashboard` (RBAC 示例)
+- `POST /api/users/v1/orders/dispatch` (RBAC 示例)
+- `PATCH /api/users/v1/workers/{user_id}/status`
 
 gRPC:
-- `CreateEcho`
-- `GetEcho`
-- `Health`
+- `EchoService.CreateEcho`
+- `EchoService.GetEcho`
+- `EchoService.Health`
+- `UserAuthService.Register`
+- `UserAuthService.Login`
+- `UserAuthService.Logout`
+- `UserAuthService.GetMe`
+- `UserAuthService.GetAdminDashboard`
+- `UserAuthService.DispatchOrder`
+- `UserAuthService.UpdateWorkerStatus`
 
 ## 本地开发
 
@@ -56,9 +70,9 @@ make proto-gen
 ```
 
 4. 运行服务（HTTP 8080 + gRPC 50051）
-
+在本地运行用这个，会使用 .env.local 中的环境变量
 ```bash
-make run
+make run-local 
 ```
 
 5. 验证服务
@@ -96,3 +110,6 @@ make docker-build
 - `HSP_USER_SERVICE_GRPC_HOST` / `HSP_USER_SERVICE_GRPC_PORT`
 - `HSP_USER_SERVICE_MYSQL_DSN`
 - `HSP_USER_SERVICE_USE_MOCK_REPOSITORY`
+- `HSP_USER_SERVICE_JWT_SECRET`
+- `HSP_USER_SERVICE_JWT_ISSUER` / `HSP_USER_SERVICE_JWT_AUDIENCE`
+- `HSP_USER_SERVICE_ACCESS_TOKEN_TTL_SECONDS`

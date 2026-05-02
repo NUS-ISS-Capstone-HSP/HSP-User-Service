@@ -1,0 +1,109 @@
+syntax = "proto3";
+
+package user.v1;
+
+enum UserRole {
+  USER_ROLE_UNSPECIFIED = 0;
+  USER_ROLE_WORKER = 1;
+  USER_ROLE_CUSTOMER_SERVICE = 2;
+  USER_ROLE_OWNER = 3;
+}
+
+enum UserStatus {
+  USER_STATUS_UNSPECIFIED = 0;
+  USER_STATUS_ACTIVE = 1;
+  USER_STATUS_DISABLED = 2;
+}
+
+enum EmploymentStatus {
+  EMPLOYMENT_STATUS_UNSPECIFIED = 0;
+  EMPLOYMENT_STATUS_ON_DUTY = 1;
+  EMPLOYMENT_STATUS_DISABLED = 2;
+}
+
+message WorkerProfile {
+  int64 id = 1;
+  int64 user_id = 2;
+  string worker_no = 3;
+  string display_name = 4;
+  EmploymentStatus employment_status = 5;
+  string created_at = 6;
+  string updated_at = 7;
+}
+
+message User {
+  int64 id = 1;
+  string email = 2;
+  UserRole role = 3;
+  UserStatus status = 4;
+  string created_at = 5;
+  string updated_at = 6;
+  string last_login_at = 7;
+  WorkerProfile worker_profile = 8;
+}
+
+message RegisterRequest {
+  string email = 1;
+  string password = 2;
+  UserRole role = 3;
+  string worker_display_name = 4;
+}
+
+message RegisterResponse {
+  User user = 1;
+}
+
+message LoginRequest {
+  string email = 1;
+  string password = 2;
+}
+
+message LoginResponse {
+  string access_token = 1;
+  string token_type = 2;
+  int64 expires_in = 3;
+  User user = 4;
+}
+
+message LogoutRequest {}
+
+message LogoutResponse {
+  string message = 1;
+}
+
+message GetMeRequest {}
+
+message GetMeResponse {
+  User user = 1;
+}
+
+message GetAdminDashboardRequest {}
+
+message GetAdminDashboardResponse {
+  string message = 1;
+}
+
+message DispatchOrderRequest {}
+
+message DispatchOrderResponse {
+  string message = 1;
+}
+
+message UpdateWorkerStatusRequest {
+  int64 user_id = 1;
+  EmploymentStatus employment_status = 2;
+}
+
+message UpdateWorkerStatusResponse {
+  User user = 1;
+}
+
+service UserAuthService {
+  rpc Register(RegisterRequest) returns (RegisterResponse);
+  rpc Login(LoginRequest) returns (LoginResponse);
+  rpc Logout(LogoutRequest) returns (LogoutResponse);
+  rpc GetMe(GetMeRequest) returns (GetMeResponse);
+  rpc GetAdminDashboard(GetAdminDashboardRequest) returns (GetAdminDashboardResponse);
+  rpc DispatchOrder(DispatchOrderRequest) returns (DispatchOrderResponse);
+  rpc UpdateWorkerStatus(UpdateWorkerStatusRequest) returns (UpdateWorkerStatusResponse);
+}

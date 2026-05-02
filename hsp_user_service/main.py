@@ -1,9 +1,11 @@
 import asyncio
+import logging
 from contextlib import suppress
 
 import uvicorn
 
 from hsp_user_service.bootstrap.container import build_container
+from hsp_user_service.config import get_settings
 
 
 async def run() -> None:
@@ -47,6 +49,11 @@ async def run() -> None:
 
 
 def main() -> None:
+    settings = get_settings()
+    logging.basicConfig(
+        level=settings.log_level.upper(),
+        format="%(asctime)s %(levelname)s [%(name)s] %(message)s",
+    )
     asyncio.run(run())
 
 

@@ -18,6 +18,11 @@ class Settings(BaseSettings):
     use_mock_repository: bool = False
     mysql_dsn: str = "mysql+aiomysql://root:root@mysql:3306/user_db"
 
+    jwt_secret: str = "change-me-in-production"
+    jwt_issuer: str = "hsp-user-service"
+    jwt_audience: str = "hsp-api"
+    access_token_ttl_seconds: int = 900
+
     model_config = SettingsConfigDict(
         env_file=".env",
         env_file_encoding="utf-8",

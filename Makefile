@@ -1,6 +1,6 @@
 PYTHON ?= python
 
-.PHONY: install lint test-unit test coverage proto-gen swagger run docker-build
+.PHONY: install lint test-unit test coverage proto-gen swagger run run-local docker-build
 
 install:
 	$(PYTHON) -m pip install --upgrade pip
@@ -20,12 +20,21 @@ coverage:
 	pytest --cov=hsp_user_service --cov-report=term-missing --cov-fail-under=70 -q
 
 proto-gen:
-	$(PYTHON) -m grpc_tools.protoc -I . --python_out=. --grpc_python_out=. rpc/echo/v1/echo.proto
+	$(PYTHON) -m grpc_tools.protoc -I . --python_out=. --grpc_python_out=. \
+		rpc/echo/v1/echo.proto \
+		rpc/user/v1/user.proto
 
 swagger:
 	$(PYTHON) -m scripts.generate_openapi
 
 run:
+	$(PYTHON) -m hsp_user_service.main
+
+run-local:
+	@set -a; \
+	if [ -f .env ]; then . ./.env; fi; \
+	if [ -f .env.local ]; then . ./.env.local; fi; \
+	set +a; \
 	$(PYTHON) -m hsp_user_service.main
 
 docker-build:
