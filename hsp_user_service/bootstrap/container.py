@@ -4,6 +4,7 @@ import grpc
 from fastapi import FastAPI
 from sqlalchemy.ext.asyncio import AsyncEngine, AsyncSession, async_sessionmaker
 
+from hsp_user_service.bootstrap.seed_users import seed_default_users
 from hsp_user_service.config import Settings, get_settings
 from hsp_user_service.infrastructure.db import (
     create_engine,
@@ -57,6 +58,7 @@ async def build_container() -> AppContainer:
         jwt_audience=settings.jwt_audience,
         access_token_ttl_seconds=settings.access_token_ttl_seconds,
     )
+    await seed_default_users(user_repository)
     http_app = create_http_app(echo_service, auth_service)
     grpc_server = build_grpc_server(settings, echo_service, auth_service)
 
