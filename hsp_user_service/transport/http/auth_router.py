@@ -3,10 +3,10 @@ from typing import Annotated
 
 from fastapi import APIRouter, Depends, Path, Request
 
-from hsp_user_service.domain.models import UserRole
+from hsp_user_service.domain.models import UserRole, WorkerProfile
 from hsp_user_service.service.auth_service import AuthenticatedIdentity, AuthService
 from hsp_user_service.transport.http.auth import AuthDependencies
-from hsp_user_service.transport.http.mapper import to_user_response
+from hsp_user_service.transport.http.mapper import to_user_response, to_worker_profile_response
 from hsp_user_service.transport.http.schemas import (
     LoginRequest,
     LoginResponse,
@@ -14,8 +14,11 @@ from hsp_user_service.transport.http.schemas import (
     MeResponse,
     RegisterRequest,
     RegisterResponse,
+    UpdateWorkerProfileRequest,
     UpdateWorkerStatusRequest,
     UpdateWorkerStatusResponse,
+    WorkerProfileManagementResponse,
+    WorkerProfileResponse,
 )
 
 logger = logging.getLogger(__name__)
@@ -56,9 +59,8 @@ def build_auth_router(auth_service: AuthService) -> APIRouter:
     async def login(payload: LoginRequest, request: Request) -> LoginResponse:
         ip = request.client.host if request.client is not None else None
         logger.info(
-            "http login request email=%s password=%s client_ip=%s user_agent=%s headers=%s",
+            "http login request email=%s client_ip=%s user_agent=%s headers=%s",
             payload.email,
-            payload.password,
             ip,
             request.headers.get("user-agent"),
             list(request.headers.keys()),
@@ -143,4 +145,45 @@ def build_auth_router(auth_service: AuthService) -> APIRouter:
         )
         return UpdateWorkerStatusResponse(user=to_user_response(updated))
 
+    @router.get(
+        "/workers/{user_id}/profile",
+        response_model=WorkerProfileManagementResponse,
+        summary="Get worker profile",
+        description="Get a worker profile by worker user id.",
+    )
+    async def get_worker_profile(
+        _: Annotated[AuthenticatedIdentity, Depends(staff_or_owner)],
+        user_id: int = Path(..., ge=1, description="Worker user id."),
+    ) -> WorkerProfileManagementResponse:
+        profile = await auth_service.get_worker_profile(user_id)
+        return WorkerProfileManagementResponse(
+            worker_profile=_to_required_worker_profile_response(profile),
+        )
+
+    @router.patch(
+        "/workers/{user_id}/profile",
+        response_model=WorkerProfileManagementResponse,
+        summary="Update worker profile",
+        description="Update basic worker profile fields.",
+    )
+    async def update_worker_profile(
+        payload: UpdateWorkerProfileRequest,
+        _: Annotated[AuthenticatedIdentity, Depends(staff_or_owner)],
+        user_id: int = Path(..., ge=1, description="Worker user id."),
+    ) -> WorkerProfileManagementResponse:
+        profile = await auth_service.update_worker_profile(
+            user_id=user_id,
+            display_name=payload.display_name,
+        )
+        return WorkerProfileManagementResponse(
+            worker_profile=_to_required_worker_profile_response(profile),
+        )
+
     return router
+
+
+def _to_required_worker_profile_response(profile: WorkerProfile) -> WorkerProfileResponse:
+    response = to_worker_profile_response(profile)
+    if response is None:
+        raise RuntimeError("worker profile is required")
+    return response

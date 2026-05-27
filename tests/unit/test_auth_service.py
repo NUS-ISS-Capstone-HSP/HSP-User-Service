@@ -1,6 +1,6 @@
 import pytest
 
-from hsp_user_service.domain.errors import AuthenticationError, ValidationError
+from hsp_user_service.domain.errors import AuthenticationError, NotFoundError, ValidationError
 from hsp_user_service.domain.models import EmploymentStatus, UserRole
 from hsp_user_service.repository.in_memory import InMemoryUserRepository
 from hsp_user_service.service.auth_service import AuthService
@@ -106,3 +106,74 @@ async def test_disabled_worker_cannot_login(auth_service: AuthService) -> None:
             ip="127.0.0.1",
             user_agent="pytest",
         )
+
+
+@pytest.mark.asyncio
+async def test_get_worker_profile_returns_registered_profile(auth_service: AuthService) -> None:
+    result = await auth_service.register(
+        email="worker@example.com",
+        password="password123",
+        role=UserRole.WORKER,
+        worker_display_name="worker-two",
+    )
+
+    profile = await auth_service.get_worker_profile(result.user.id)
+
+    assert profile.user_id == result.user.id
+    assert profile.display_name == "worker-two"
+
+
+@pytest.mark.asyncio
+async def test_update_worker_profile_trims_display_name(auth_service: AuthService) -> None:
+    result = await auth_service.register(
+        email="worker@example.com",
+        password="password123",
+        role=UserRole.WORKER,
+        worker_display_name="worker-two",
+    )
+
+    profile = await auth_service.update_worker_profile(
+        user_id=result.user.id,
+        display_name="  worker-renamed  ",
+    )
+
+    assert profile.display_name == "worker-renamed"
+
+
+@pytest.mark.asyncio
+async def test_update_worker_profile_rejects_empty_display_name(
+    auth_service: AuthService,
+) -> None:
+    result = await auth_service.register(
+        email="worker@example.com",
+        password="password123",
+        role=UserRole.WORKER,
+        worker_display_name="worker-two",
+    )
+
+    with pytest.raises(ValidationError):
+        await auth_service.update_worker_profile(
+            user_id=result.user.id,
+            display_name="   ",
+        )
+
+
+@pytest.mark.asyncio
+async def test_get_worker_profile_rejects_non_worker(auth_service: AuthService) -> None:
+    result = await auth_service.register(
+        email="cs@example.com",
+        password="password123",
+        role=UserRole.CUSTOMER_SERVICE,
+        worker_display_name=None,
+    )
+
+    with pytest.raises(ValidationError):
+        await auth_service.get_worker_profile(result.user.id)
+
+
+@pytest.mark.asyncio
+async def test_get_worker_profile_missing_user_raises_not_found(
+    auth_service: AuthService,
+) -> None:
+    with pytest.raises(NotFoundError):
+        await auth_service.get_worker_profile(999)

@@ -165,3 +165,72 @@ def test_disabled_worker_cannot_login() -> None:
     )
 
     assert worker_login.status_code == 401
+
+
+def test_customer_service_can_manage_worker_profile() -> None:
+    client = build_client()
+    worker_resp = client.post(
+        "/api/users/v1/auth/register",
+        json={
+            "email": "worker@example.com",
+            "password": "password123",
+            "role": "WORKER",
+            "worker_display_name": "worker-one",
+        },
+    )
+    client.post(
+        "/api/users/v1/auth/register",
+        json={
+            "email": "cs@example.com",
+            "password": "password123",
+            "role": "CUSTOMER_SERVICE",
+        },
+    )
+    cs_login = client.post(
+        "/api/users/v1/auth/login",
+        json={"email": "cs@example.com", "password": "password123"},
+    )
+    cs_token = cs_login.json()["access_token"]
+    worker_user_id = worker_resp.json()["user"]["id"]
+
+    update_resp = client.patch(
+        f"/api/users/v1/workers/{worker_user_id}/profile",
+        headers=_auth_header(cs_token),
+        json={"display_name": "worker-renamed"},
+    )
+    get_resp = client.get(
+        f"/api/users/v1/workers/{worker_user_id}/profile",
+        headers=_auth_header(cs_token),
+    )
+
+    assert update_resp.status_code == 200
+    assert update_resp.json()["worker_profile"]["display_name"] == "worker-renamed"
+    assert get_resp.status_code == 200
+    assert get_resp.json()["worker_profile"]["display_name"] == "worker-renamed"
+
+
+def test_worker_cannot_manage_worker_profile() -> None:
+    client = build_client()
+    worker_resp = client.post(
+        "/api/users/v1/auth/register",
+        json={
+            "email": "worker@example.com",
+            "password": "password123",
+            "role": "WORKER",
+            "worker_display_name": "worker-one",
+        },
+    )
+    login_resp = client.post(
+        "/api/users/v1/auth/login",
+        json={"email": "worker@example.com", "password": "password123"},
+    )
+    token = login_resp.json()["access_token"]
+    worker_user_id = worker_resp.json()["user"]["id"]
+
+    response = client.patch(
+        f"/api/users/v1/workers/{worker_user_id}/profile",
+        headers=_auth_header(token),
+        json={"display_name": "worker-renamed"},
+    )
+
+    assert response.status_code == 403

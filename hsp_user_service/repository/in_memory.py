@@ -158,6 +158,27 @@ class InMemoryUserRepository(UserRepository):
         self._worker_profiles_by_user_id[user_id] = updated
         return updated
 
+    async def update_worker_profile_display_name(
+        self,
+        user_id: int,
+        display_name: str,
+    ) -> WorkerProfile | None:
+        profile = self._worker_profiles_by_user_id.get(user_id)
+        if profile is None:
+            return None
+        now = datetime.now(UTC)
+        updated = WorkerProfile(
+            id=profile.id,
+            user_id=profile.user_id,
+            worker_no=profile.worker_no,
+            display_name=display_name,
+            employment_status=profile.employment_status,
+            created_at=profile.created_at,
+            updated_at=now,
+        )
+        self._worker_profiles_by_user_id[user_id] = updated
+        return updated
+
     async def create_login_audit_log(
         self,
         user_id: int | None,

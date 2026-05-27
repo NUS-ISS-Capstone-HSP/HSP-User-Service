@@ -24,6 +24,8 @@ HTTP:
 - `GET /api/users/v1/admin/dashboard` (RBAC 示例)
 - `POST /api/users/v1/orders/dispatch` (RBAC 示例)
 - `PATCH /api/users/v1/workers/{user_id}/status`
+- `GET /api/users/v1/workers/{user_id}/profile`
+- `PATCH /api/users/v1/workers/{user_id}/profile`
 
 gRPC:
 - `EchoService.CreateEcho`

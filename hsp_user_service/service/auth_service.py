@@ -200,6 +200,36 @@ class AuthService:
         worker_profile = await self._repository.get_worker_profile_by_user_id(user.id)
         return AuthenticatedIdentity(user=user, worker_profile=worker_profile)
 
+    async def get_worker_profile(self, user_id: int) -> WorkerProfile:
+        user = await self._repository.get_user_by_id(user_id)
+        if user is None:
+            raise NotFoundError("user not found")
+        if user.role != UserRole.WORKER:
+            raise ValidationError("target user is not WORKER")
+
+        worker_profile = await self._repository.get_worker_profile_by_user_id(user_id)
+        if worker_profile is None:
+            raise NotFoundError("worker profile not found")
+        return worker_profile
+
+    async def update_worker_profile(
+        self,
+        user_id: int,
+        display_name: str,
+    ) -> WorkerProfile:
+        normalized_display_name = display_name.strip()
+        if not normalized_display_name:
+            raise ValidationError("display_name must not be empty")
+
+        await self.get_worker_profile(user_id)
+        worker_profile = await self._repository.update_worker_profile_display_name(
+            user_id,
+            normalized_display_name,
+        )
+        if worker_profile is None:
+            raise NotFoundError("worker profile not found")
+        return worker_profile
+
     async def authenticate_access_token(self, token: str) -> AuthenticatedIdentity:
         payload = self._decode_access_token(token)
         user_id_str = payload.get("sub")

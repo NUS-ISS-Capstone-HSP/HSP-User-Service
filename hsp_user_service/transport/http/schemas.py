@@ -101,3 +101,15 @@ class UpdateWorkerStatusRequest(BaseModel):
 
 class UpdateWorkerStatusResponse(BaseModel):
     user: UserResponse = Field(description="Updated worker user profile.")
+
+
+class UpdateWorkerProfileRequest(BaseModel):
+    display_name: str = Field(
+        min_length=1,
+        max_length=128,
+        description="Worker display name.",
+    )
+
+
+class WorkerProfileManagementResponse(BaseModel):
+    worker_profile: WorkerProfileResponse = Field(description="Worker profile.")

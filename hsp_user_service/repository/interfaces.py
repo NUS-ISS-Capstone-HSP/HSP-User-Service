@@ -63,6 +63,13 @@ class UserRepository(Protocol):
     ) -> WorkerProfile | None:
         ...
 
+    async def update_worker_profile_display_name(
+        self,
+        user_id: int,
+        display_name: str,
+    ) -> WorkerProfile | None:
+        ...
+
     async def create_login_audit_log(
         self,
         user_id: int | None,

@@ -183,6 +183,23 @@ class SQLAlchemyUserRepository(UserRepository):
             await session.refresh(row)
         return _to_domain_worker_profile(row)
 
+    async def update_worker_profile_display_name(
+        self,
+        user_id: int,
+        display_name: str,
+    ) -> WorkerProfile | None:
+        async with self._session_factory() as session:
+            stmt = select(WorkerProfileORM).where(WorkerProfileORM.user_id == user_id)
+            result = await session.execute(stmt)
+            row = result.scalar_one_or_none()
+            if row is None:
+                return None
+            row.display_name = display_name
+            row.updated_at = _utc_now()
+            await session.commit()
+            await session.refresh(row)
+        return _to_domain_worker_profile(row)
+
     async def create_login_audit_log(
         self,
         user_id: int | None,
