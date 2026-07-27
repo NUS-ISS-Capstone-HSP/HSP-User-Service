@@ -1,0 +1,15 @@
+.venv/
+__pycache__/
+.mypy_cache/
+.pytest_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+log/
+
+# Generated artifacts
+docs/openapi.json
+rpc/echo/v1/echo_pb2.py
+rpc/echo/v1/echo_pb2_grpc.py
+rpc/user/v1/user_pb2.py
+rpc/user/v1/user_pb2_grpc.py

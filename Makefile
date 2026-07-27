@@ -1,6 +1,6 @@
 PYTHON ?= python
 
-.PHONY: install lint test-unit test coverage proto-gen swagger run run-local docker-build
+.PHONY: install lint test-unit test coverage sast proto-gen swagger run run-local docker-build
 
 install:
 	$(PYTHON) -m pip install --upgrade pip
@@ -18,6 +18,9 @@ test:
 
 coverage:
 	pytest --cov=hsp_user_service --cov-report=term-missing --cov-fail-under=70 -q
+
+sast:
+	semgrep scan --config=p/python --config=p/owasp-top-ten --config=p/secrets --metrics=off --error hsp_user_service scripts
 
 proto-gen:
 	$(PYTHON) -m grpc_tools.protoc -I . --python_out=. --grpc_python_out=. \

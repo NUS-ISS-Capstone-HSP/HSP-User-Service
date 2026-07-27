@@ -53,6 +53,10 @@ jobs:
         continue-on-error: true
         run: bandit -q -r hsp_user_service
 
+      - name: Security scan - semgrep
+        continue-on-error: true
+        run: make sast
+
       - name: Security scan - pip-audit
         continue-on-error: true
         run: pip-audit
