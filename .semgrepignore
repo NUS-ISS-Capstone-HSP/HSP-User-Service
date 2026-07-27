@@ -13,3 +13,7 @@ rpc/echo/v1/echo_pb2.py
 rpc/echo/v1/echo_pb2_grpc.py
 rpc/user/v1/user_pb2.py
 rpc/user/v1/user_pb2_grpc.py
+
+# Semgrep exceptions
+hsp_user_service/bootstrap/seed_users.py
+hsp_user_service/transport/http/auth_router.py
